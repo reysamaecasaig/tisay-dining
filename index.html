@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tisay Dining</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #faf7ff;
+      color: #14101f;
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(91, 33, 182, 0.1);
+      text-align: center;
+      border: 1px solid rgba(91, 33, 182, 0.16);
+      max-width: 400px;
+      width: 90%;
+    }
+    h1 { margin-bottom: 8px; color: #5b21b6; }
+    p { color: #6b5f85; margin-bottom: 24px; font-size: 0.95rem; }
+    .btn-group { display: flex; flex-direction: column; gap: 12px; }
+    a {
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+    a:hover { transform: translateY(-2px); }
+    .btn-user { background: #8b5cf6; color: #fff; box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35); }
+    .btn-admin { background: rgba(139, 92, 246, 0.1); color: #5b21b6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Tisay Dining</h1>
+    <p>Welcome to our restaurant system. Please select your portal:</p>
+    <div class="btn-group">
+      <a href="User/home.html" class="btn-user">Customer Portal</a>
+      <a href="Admin/admin.html" class="btn-admin">Admin Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>
