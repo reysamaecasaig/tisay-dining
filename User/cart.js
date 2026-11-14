@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 import { collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const topbar = document.getElementById("topbar");
+const navProfileImg = document.querySelector(".profile-img");
 const cartItemsContainer = document.getElementById("cartItems");
 const itemCountEl = document.getElementById("itemCount");
 const totalAmountEl = document.getElementById("totalAmount");
@@ -31,6 +32,11 @@ onAuthStateChanged(auth, async (user) => {
         if (nameInput && !nameInput.value) nameInput.value = data.fullName || "";
         if (contactInput && !contactInput.value) contactInput.value = data.mobile || "";
         if (addressInput && !addressInput.value) addressInput.value = data.address || "";
+        
+        // Connect profile avatar if available in Firestore
+        if (data.avatar && navProfileImg) {
+          navProfileImg.src = data.avatar;
+        }
       }
     } catch (err) {}
   } else {
