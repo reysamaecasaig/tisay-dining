@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - Tisay Dining</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="profile.css">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+</head>
+<body>
+
+  <header class="topbar" id="topbar">
+    <a href="home.html" class="logo" aria-label="Tisay Dining Home">
+      <span class="logo-circle">
+        <img src="logo.jpg" alt="Logo">
+      </span>
+      <span class="logo-text">Tisay Dining</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link">About Us</a>
+      <a href="profile.html" class="nav-link active">
+        <span class="profile-link">
+          <img src="logo.jpg" alt="Profile" class="profile-img" id="navProfileImg">
+        </span>
+      </a>
+    </nav>
+  </header>
+
+  <main class="profile-page">
+    <h1 class="page-title">My Account</h1>
+
+    <div class="profile-layout">
+      <div class="card">
+        <h2>Personal Information</h2>
+        <div class="user-profile-header">
+          <div class="profile-avatar" id="avatarTrigger" title="Click to change photo">
+            <img src="logo.jpg" alt="Avatar" id="profileAvatarImg">
+            <div class="avatar-overlay">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
+          </div>
+          <input type="file" id="avatarFileInput" accept="image/*" hidden>
+
+          <div class="user-meta">
+            <span class="user-fullname" id="userFullName">Loading name...</span>
+            <span class="user-phone" id="userPhone">Loading phone...</span>
+            <span class="user-address" id="userAddress">Loading address...</span>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button type="button" class="btn-primary" id="openEditModalBtn">Edit Profile</button>
+          <button type="button" class="btn-outline" id="logoutBtn">Log Out</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Loyalty Rewards</h2>
+        <div class="points-display">
+          <span class="points-label">Available Points</span>
+          <div class="points-value-wrap">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span class="points-number" id="userPoints">150</span>
+          </div>
+          <p class="points-sub">Earn points with every order placed through your account!</p>
+        </div>
+        <div class="reward-perk">
+          <span>Current Perk Tier</span>
+          <strong id="userTier">Silver Member</strong>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" id="cropModal">
+    <div class="modal-card crop-modal-card">
+      <h2>Adjust Profile Picture</h2>
+      <div class="crop-preview-area" id="cropArea">
+        <canvas id="cropCanvas" width="240" height="240"></canvas>
+      </div>
+      <div class="crop-controls">
+        <label for="zoomSlider">Zoom</label>
+        <input type="range" id="zoomSlider" min="1" max="3" step="0.05" value="1">
+      </div>
+      <p class="crop-hint">Drag image to reposition</p>
+      <div class="modal-buttons">
+        <button type="button" class="btn-outline" id="cancelCropBtn">Cancel</button>
+        <button type="button" class="btn-primary" id="saveCropBtn">Apply Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="editModal">
+    <div class="modal-card">
+      <h2>Edit Profile</h2>
+      <form id="editProfileForm">
+        <div class="field">
+          <label for="editFullName">Full Name</label>
+          <input type="text" id="editFullName" required>
+        </div>
+        <div class="field">
+          <label for="editPhone">Mobile Number</label>
+          <input type="tel" id="editPhone" required>
+        </div>
+        <div class="field">
+          <label for="editAddress">Address</label>
+          <textarea id="editAddress" required></textarea>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn-outline" id="closeModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="profile.js"></script>
+</body>
+</html>

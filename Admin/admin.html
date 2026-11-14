@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+</head>
+<body>
+
+  <header class="topbar" id="topbar">
+    <a href="admin.html" class="logo" aria-label="Admin Dashboard">
+      <span class="logo-circle">
+        <img src="logo.jpg" alt="Logo">
+      </span>
+      <span class="logo-text">Admin</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+    </nav>
+  </header>
+
+  <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h10"></path>
+    </svg>
+    <span>Menu</span>
+  </button>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar" aria-label="Navigation">
+    <div class="sidebar-head">
+      <h2>Navigation</h2>
+    </div>
+
+    <ul class="category-list">
+      <li><a href="admin.html" class="category active">Dashboard</a></li>
+      <li><a href="dish.html" class="category">Dishes</a></li>
+      <li><a href="request.html" class="category">Pending Request</a></li>
+      <li><a href="history.html" class="category">History</a></li>
+    </ul>
+
+    <div class="sidebar-user">
+      <img class="user-img" src="logo.jpg" alt="Admin">
+      <span class="user-name">Admin</span>
+      <button class="logout-btn" id="logoutBtn" type="button" aria-label="Log out" title="Log out">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <path d="M16 17l5-5-5-5"></path>
+          <path d="M21 12H9"></path>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <h1 class="section-title">Dashboard Overview</h1>
+
+    <div class="visitor-card">
+      <span class="visitor-label">Total Registered Users</span>
+      <h2 class="visitor-count" id="visitorCount">0</h2>
+    </div>
+
+    <div class="analytics-card">
+      <div class="analytics-header">
+        <div class="analytics-title-group">
+          <h2>Sales &amp; Revenue</h2>
+          <p id="analyticsSubtitle"></p>
+        </div>
+        <div class="filter-group">
+          <button type="button" class="filter-btn active" data-filter="week">Week</button>
+          <button type="button" class="filter-btn" data-filter="month">Month</button>
+          <button type="button" class="filter-btn" data-filter="year">Year</button>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <span class="stat-label">Total Revenue</span>
+          <h3 class="stat-value" id="totalRevenue">₱12,450.00</h3>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Total Buyers</span>
+          <h3 class="stat-value" id="totalBuyers">48</h3>
+        </div>
+      </div>
+
+      <div class="chart" id="chart">
+        <svg id="chartSvg" role="img" aria-label="Revenue chart"></svg>
+        <div class="chart-tip" id="chartTip" hidden></div>
+        <p class="chart-empty" id="chartEmpty" hidden>No sales recorded for this period</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

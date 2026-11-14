@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forgot Password</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="forgot.css">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+</head>
+<body>
+
+  <main class="auth-card">
+    <div class="auth-header">
+      <div class="logo-circle">
+        <img src="logo.jpg" alt="Logo">
+      </div>
+      <h1 class="auth-title">Reset Password</h1>
+      <p class="auth-subtitle">Enter your registered email address and we'll send you a password reset link.</p>
+    </div>
+
+    <form id="forgotForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="resetEmail">Email Address</label>
+        <div class="input-wrap">
+          <input class="form-input" type="email" id="resetEmail" placeholder="Enter your email" required>
+        </div>
+      </div>
+
+      <button type="submit" class="primary-btn" id="sendResetBtn">Send Reset Link</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Remembered your password? <a href="index.html" class="auth-link">Back to Log In</a></p>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="forgot.js"></script>
+</body>
+</html>

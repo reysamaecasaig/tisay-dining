@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Security</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+  <main class="auth-card">
+    <div class="auth-header">
+      <div class="logo-circle">
+        <img src="logo.jpg" alt="Logo">
+      </div>
+      <h1 class="auth-title">Account Setup</h1>
+      <p class="auth-subtitle">Set your email and password</p>
+      <span class="step-badge">2 - 2</span>
+    </div>
+
+    <form id="signStep2Form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input class="form-input" type="email" id="email" placeholder="Enter your email" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="createPassword">Create Password</label>
+        <div class="input-wrap">
+          <input class="form-input has-icon" type="password" id="createPassword" placeholder="Create a password" required>
+          <button type="button" class="eye-btn" data-target="createPassword" aria-label="Toggle password visibility"></button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmPassword">Confirm Password</label>
+        <div class="input-wrap">
+          <input class="form-input has-icon" type="password" id="confirmPassword" placeholder="Confirm your password" required>
+          <button type="button" class="eye-btn" data-target="confirmPassword" aria-label="Toggle confirm password visibility"></button>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <a href="sign.html" class="secondary-btn">Back</a>
+        <button type="submit" class="primary-btn">Create Account</button>
+      </div>
+    </form>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="sign2.js"></script>
+</body>
+</html>

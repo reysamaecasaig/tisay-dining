@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tisay Dining | Cart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="cart.css">
+</head>
+<body>
+
+  <header class="topbar" id="topbar">
+    <a href="home.html" class="logo" aria-label="Tisay Dining home">
+      <span class="logo-circle">
+        <img src="logo.jpg" alt="Tisay Dining logo">
+      </span>
+      <span class="logo-text">Tisay Dining</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link">About Us</a>
+      <a href="profile.html" class="profile-link" aria-label="Go to profile">
+        <img class="profile-img" src="vince.jpg" alt="Profile picture">
+      </a>
+    </nav>
+  </header>
+
+  <main class="cart-page">
+    <h1 class="page-title">Cart</h1>
+
+    <div class="cart-layout">
+
+      <section class="card items-card" aria-label="Cart items">
+        <h2>Items</h2>
+        <div class="cart-items" id="cartItems"></div>
+        
+        <div class="cart-total-footer" id="cartTotalFooter">
+          <div class="summary-row"><span>Total Items</span><strong id="itemCount">0</strong></div>
+          <div class="cart-total-row">
+            <span class="total-label">Total Payment</span>
+            <span class="total-amount" id="totalAmount">₱0.00</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card info-card" aria-label="Customer information">
+        <h2>Information</h2>
+        <form id="orderForm" novalidate>
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Juan Dela Cruz" autocomplete="name">
+            <span class="error-text" id="nameError"></span>
+          </div>
+          <div class="field">
+            <label for="contact">Contact Number</label>
+            <input type="tel" id="contact" name="contact" placeholder="09123456789" autocomplete="tel" inputmode="tel">
+            <span class="error-text" id="contactError"></span>
+          </div>
+          <div class="field">
+            <label for="address">Address</label>
+            <textarea id="address" name="address" placeholder="House no., street, barangay, city" autocomplete="street-address"></textarea>
+            <span class="error-text" id="addressError"></span>
+          </div>
+          <button type="submit" class="order-btn" id="orderBtn">Order</button>
+        </form>
+      </aside>
+
+    </div>
+  </main>
+
+  <div class="modal" id="thanksModal" role="dialog" aria-modal="true" aria-labelledby="thanksTitle">
+    <div class="thanks-card">
+      <div class="check">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12.5l4.5 4.5L19 7.5"></path>
+        </svg>
+      </div>
+      <h2 id="thanksTitle">Thank you!</h2>
+      <p id="thanksMessage"></p>
+      <span class="thanks-total" id="thanksTotal"></span>
+      <a href="home.html" class="btn-link">Back to Home</a>
+    </div>
+  </div>
+
+  <script type="module" src="cart.js"></script>
+</body>
+</html>

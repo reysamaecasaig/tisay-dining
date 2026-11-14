@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tisay Dining | Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+</head>
+<body>
+
+  <header class="topbar" id="topbar">
+    <a href="home.html" class="logo" aria-label="Tisay Dining home">
+      <span class="logo-circle">
+        <img src="logo.jpg" alt="Tisay Dining logo">
+      </span>
+      <span class="logo-text">Tisay Dining</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="home.html" class="nav-link active">Home</a>
+      <a href="about.html" class="nav-link">About Us</a>
+      <a href="profile.html" class="profile-link" aria-label="Go to profile">
+        <img class="profile-img" id="navProfileImg" src="logo.jpg" alt="Profile picture">
+      </a>
+    </nav>
+  </header>
+
+  <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h10"></path>
+    </svg>
+    <span>Menu</span>
+  </button>
+
+  <a href="cart.html" class="cart-btn" aria-label="Go to cart">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="9" cy="20" r="1.4"></circle>
+      <circle cx="18" cy="20" r="1.4"></circle>
+      <path d="M2.5 3.5h2.8l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.2l1.6-7.3H6.3"></path>
+    </svg>
+    <span class="cart-count" id="cartCount">0</span>
+  </a>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar" aria-label="Categories">
+    <div class="sidebar-head">
+      <h2>Categories</h2>
+    </div>
+
+    <ul class="category-list" id="categoryList">
+      <li><button type="button" class="category active" data-category="Foods">Foods</button></li>
+      <li><button type="button" class="category" data-category="Desserts">Desserts</button></li>
+      <li><button type="button" class="category" data-category="Drinks">Drinks</button></li>
+    </ul>
+
+    <div class="sidebar-user">
+      <img class="user-img" id="sidebarProfileImg" src="logo.jpg" alt="Profile picture">
+      <span class="user-name" id="userName">Loading...</span>
+      <button class="logout-btn" id="logoutBtn" type="button" aria-label="Log out" title="Log out">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <path d="M16 17l5-5-5-5"></path>
+          <path d="M21 12H9"></path>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <h1 class="section-title" id="sectionTitle">Foods</h1>
+    <section class="dish-grid" data-category="Foods" id="grid-Foods">
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">Loading dishes from Firebase...</div>
+    </section>
+
+    <section class="dish-grid" data-category="Desserts" id="grid-Desserts" hidden>
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">Loading desserts from Firebase...</div>
+    </section>
+
+    <section class="dish-grid" data-category="Drinks" id="grid-Drinks" hidden>
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">Loading drinks from Firebase...</div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="home.js"></script>
+</body>
+</html>

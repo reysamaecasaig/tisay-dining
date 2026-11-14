@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+  <main class="auth-card">
+    <div class="auth-header">
+      <div class="logo-circle">
+        <img src="logo.jpg" alt="Logo">
+      </div>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-subtitle">Tell us a bit about yourself</p>
+      <span class="step-badge">1 - 2</span>
+    </div>
+
+    <form id="signStep1Form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="fullName">Name</label>
+        <input class="form-input" type="text" id="fullName" placeholder="Enter your name" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="age">Age</label>
+          <input class="form-input" type="number" id="age" min="1" max="120" placeholder="Age" required>
+        </div>
+
+        <div class="form-group" id="birthdateGroup">
+          <label class="form-label" for="birthdate">Birthdate</label>
+          <div class="input-wrap">
+            <input class="form-input has-icon" type="text" id="birthdate" placeholder="Select date" readonly required>
+            <button type="button" class="eye-btn" id="calendarToggle" aria-label="Open calendar">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="calendar-popup" id="calendarPopup">
+            <div class="cal-header">
+              <button type="button" class="cal-nav" id="prevMonth" aria-label="Previous month">&lsaquo;</button>
+              <div class="cal-selects">
+                <select class="cal-select" id="calMonth"></select>
+                <select class="cal-select" id="calYear"></select>
+              </div>
+              <button type="button" class="cal-nav" id="nextMonth" aria-label="Next month">&rsaquo;</button>
+            </div>
+            <div class="cal-weekdays">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div class="cal-days" id="calDays"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="mobile">Mobile Number</label>
+        <input class="form-input" type="tel" id="mobile" placeholder="Enter mobile number" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="address">Address</label>
+        <input class="form-input" type="text" id="address" placeholder="Enter address" required>
+      </div>
+
+      <button type="submit" class="primary-btn">Next</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a href="index.html" class="auth-link">Log in</a></p>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="sign.js"></script>
+</body>
+</html>
