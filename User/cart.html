@@ -34,11 +34,21 @@
     <div class="cart-layout">
 
       <section class="card items-card" aria-label="Cart items">
-        <h2>Items</h2>
+        <div class="card-head">
+          <h2>Items</h2>
+          <div class="points-balance" title="Your loyalty points">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <span id="pointsBalance">0</span>
+            <small>pts</small>
+          </div>
+        </div>
         <div class="cart-items" id="cartItems"></div>
         
         <div class="cart-total-footer" id="cartTotalFooter">
           <div class="summary-row"><span>Total Items</span><strong id="itemCount">0</strong></div>
+          <div class="summary-row" id="pointsUsedRow" hidden><span>Points Used</span><strong id="pointsUsed">0 pts</strong></div>
+          <div class="summary-row" id="pointsLeftRow" hidden><span>Points After Order</span><strong id="pointsLeft">0 pts</strong></div>
+          <div class="summary-row"><span>Points to Earn</span><strong id="pointsEarn">+0 pts</strong></div>
           <div class="cart-total-row">
             <span class="total-label">Total Payment</span>
             <span class="total-amount" id="totalAmount">₱0.00</span>
@@ -84,6 +94,8 @@
       <a href="home.html" class="btn-link">Back to Home</a>
     </div>
   </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script type="module" src="cart.js"></script>
 </body>

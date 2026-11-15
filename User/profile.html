@@ -67,14 +67,38 @@
           <span class="points-label">Available Points</span>
           <div class="points-value-wrap">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span class="points-number" id="userPoints">150</span>
+            <span class="points-number" id="userPoints">0</span>
           </div>
-          <p class="points-sub">Earn points with every order placed through your account!</p>
+          <p class="points-sub" id="pointsPending">Earn 1 point for every dish you order.</p>
         </div>
+
+        <div class="reward-list">
+          <div class="reward-row" data-cost="150">
+            <div class="reward-top"><span class="reward-name">Free Food</span><span class="reward-cost">150 pts</span></div>
+            <div class="reward-bar"><span></span></div>
+            <small class="reward-state"></small>
+          </div>
+          <div class="reward-row" data-cost="100">
+            <div class="reward-top"><span class="reward-name">Free Dessert</span><span class="reward-cost">100 pts</span></div>
+            <div class="reward-bar"><span></span></div>
+            <small class="reward-state"></small>
+          </div>
+          <div class="reward-row" data-cost="50">
+            <div class="reward-top"><span class="reward-name">Free Drink</span><span class="reward-cost">50 pts</span></div>
+            <div class="reward-bar"><span></span></div>
+            <small class="reward-state"></small>
+          </div>
+        </div>
+
         <div class="reward-perk">
-          <span>Current Perk Tier</span>
-          <strong id="userTier">Silver Member</strong>
+          <span>Total Points Earned</span>
+          <strong id="userEarned">0 pts</strong>
         </div>
+
+        <h3 class="activity-title">Points Activity</h3>
+        <ul class="activity-list" id="activityList">
+          <li class="activity-empty">No orders yet.</li>
+        </ul>
       </div>
     </div>
   </main>

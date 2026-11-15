@@ -504,6 +504,28 @@ button {
   color: var(--violet-deep);
 }
 
+.detail-item-price.points {
+  color: var(--violet);
+}
+
+.points-tag {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--violet-deep);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.detail-points-info {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--violet);
+}
+
 .detail-footer {
   display: flex;
   justify-content: space-between;

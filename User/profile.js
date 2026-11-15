@@ -1,12 +1,16 @@
 import { auth, db } from "../firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc, setDoc, onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { syncOrderDoc, countDishes, REFUND_STATUSES } from "../points.js";
 
 const userFullName = document.getElementById("userFullName");
 const userPhone = document.getElementById("userPhone");
 const userAddress = document.getElementById("userAddress");
 const userPoints = document.getElementById("userPoints");
-const userTier = document.getElementById("userTier");
+const pointsPending = document.getElementById("pointsPending");
+const userEarned = document.getElementById("userEarned");
+const activityList = document.getElementById("activityList");
+const rewardRows = document.querySelectorAll(".reward-row");
 const profileAvatarImg = document.getElementById("profileAvatarImg");
 const navProfileImg = document.getElementById("navProfileImg");
 
@@ -31,6 +35,8 @@ const editPhone = document.getElementById("editPhone");
 const editAddress = document.getElementById("editAddress");
 
 let currentUid = null;
+let watching = false;
+let balance = 0;
 let loadedImage = null;
 let imgScale = 1;
 let imgX = 0;
@@ -38,6 +44,100 @@ let imgY = 0;
 let isDragging = false;
 let startX = 0;
 let startY = 0;
+
+function renderBalance(points) {
+  balance = points;
+  userPoints.textContent = points.toLocaleString();
+
+  rewardRows.forEach((row) => {
+    const cost = Number(row.dataset.cost);
+    const bar = row.querySelector(".reward-bar span");
+    const state = row.querySelector(".reward-state");
+    const ready = points >= cost;
+    bar.style.width = Math.min(100, (points / cost) * 100) + "%";
+    row.classList.toggle("ready", ready);
+    state.textContent = ready
+      ? "Ready to use at checkout"
+      : (cost - points).toLocaleString() + " more points to go";
+  });
+}
+
+function formatDate(order) {
+  const stamp = order.createdAt && order.createdAt.toDate ? order.createdAt.toDate() : null;
+  if (!stamp) return order.time || "";
+  return stamp.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+}
+
+function renderActivity(orders) {
+  const sorted = orders.slice().sort((a, b) => {
+    const left = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : Number.MAX_SAFE_INTEGER;
+    const right = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : Number.MAX_SAFE_INTEGER;
+    return right - left;
+  });
+
+  let pending = 0;
+  let earned = 0;
+
+  sorted.forEach((order) => {
+    const dishes = countDishes(order.items);
+    if (order.status === "Accepted") earned += Number(order.pointsEarned) || dishes;
+    if (order.status === "Pending") pending += dishes;
+  });
+
+  userEarned.textContent = earned.toLocaleString() + " pts";
+  pointsPending.textContent = pending
+    ? pending.toLocaleString() + (pending === 1 ? " point" : " points") + " pending admin approval"
+    : "Earn 1 point for every dish you order.";
+
+  if (!sorted.length) {
+    activityList.innerHTML = '<li class="activity-empty">No orders yet.</li>';
+    return;
+  }
+
+  activityList.innerHTML = sorted.map((order) => {
+    const dishes = countDishes(order.items);
+    const used = Number(order.pointsUsed) || 0;
+    const status = order.status || "Pending";
+    const refunded = REFUND_STATUSES.includes(status);
+    const chipClass = status === "Accepted" ? "accepted" : refunded ? "rejected" : "";
+
+    let gain = '<span class="activity-pts wait">+' + dishes + ' pending</span>';
+    if (status === "Accepted") gain = '<span class="activity-pts">+' + (Number(order.pointsEarned) || dishes) + ' pts</span>';
+    if (refunded) gain = '<span class="activity-pts wait">No points</span>';
+
+    let spent = "";
+    if (used) {
+      spent = refunded
+        ? '<span class="activity-pts wait">' + used + ' pts refunded</span>'
+        : '<span class="activity-pts minus">-' + used + ' pts</span>';
+    }
+
+    return '<li><div class="activity-main"><strong>' + dishes + (dishes === 1 ? " dish" : " dishes") +
+      '</strong><small>' + formatDate(order) + '</small></div><div class="activity-side">' +
+      gain + spent + '<span class="chip ' + chipClass + '">' + status + '</span></div></li>';
+  }).join("");
+}
+
+function watchLoyalty(uid) {
+  if (watching) return;
+  watching = true;
+
+  onSnapshot(doc(db, "users", uid), (snap) => {
+    renderBalance(snap.exists() ? Number(snap.data().points) || 0 : 0);
+  });
+
+  onSnapshot(query(collection(db, "orders"), where("uid", "==", uid)), (snap) => {
+    const orders = [];
+    snap.forEach((docSnap) => {
+      const order = docSnap.data();
+      orders.push(order);
+      syncOrderDoc(db, docSnap.id, order);
+    });
+    renderActivity(orders);
+  }, () => {
+    showToast("Could not load points activity.");
+  });
+}
 
 function showToast(msg) {
   const toast = document.getElementById("toast");
@@ -50,6 +150,7 @@ function showToast(msg) {
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUid = user.uid;
+    watchLoyalty(user.uid);
     try {
       const docRef = doc(db, "users", currentUid);
       const docSnap = await getDoc(docRef);
@@ -59,8 +160,7 @@ onAuthStateChanged(auth, async (user) => {
         userFullName.textContent = data.fullName || user.email;
         userPhone.textContent = data.mobile || "No phone added";
         userAddress.textContent = data.address || "No address added";
-        userPoints.textContent = data.points !== undefined ? data.points : 150;
-        userTier.textContent = data.tier || "Silver Member";
+        renderBalance(Number(data.points) || 0);
 
         if (data.avatar) {
           profileAvatarImg.src = data.avatar;

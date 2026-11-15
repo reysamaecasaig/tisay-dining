@@ -336,6 +336,167 @@ button {
   line-height: 1.4;
 }
 
+.reward-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.reward-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  font-size: 0.86rem;
+}
+
+.reward-name {
+  font-weight: 500;
+}
+
+.reward-cost {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.reward-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.12);
+  overflow: hidden;
+}
+
+.reward-bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--violet), var(--violet-bright));
+  transition: width 0.5s ease;
+}
+
+.reward-state {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.reward-row.ready .reward-state {
+  color: var(--violet-deep);
+  font-weight: 500;
+}
+
+.activity-title {
+  margin: 20px 0 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.activity-list {
+  list-style: none;
+  display: block;
+  height: auto;
+  max-height: 230px;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--violet-bright) transparent;
+}
+
+.activity-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.activity-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--violet-bright);
+}
+
+.activity-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.activity-list li {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.activity-list li:last-child {
+  border-bottom: none;
+}
+
+.activity-empty {
+  justify-content: center !important;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.activity-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.activity-main strong {
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.activity-main small {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.activity-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.activity-pts {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--violet-deep);
+}
+
+.activity-pts.minus {
+  color: #dc2626;
+}
+
+.activity-pts.wait {
+  color: var(--text-muted);
+}
+
+.chip {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  background: rgba(107, 95, 133, 0.12);
+  color: var(--text-muted);
+}
+
+.chip.accepted {
+  background: rgba(139, 92, 246, 0.14);
+  color: var(--violet-deep);
+}
+
+.chip.rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
 .reward-perk {
   display: flex;
   flex-direction: column;
@@ -553,5 +714,8 @@ button {
   }
   .card {
     padding: 18px 14px;
+  }
+  .activity-list {
+    max-height: 210px;
   }
 }

@@ -1,6 +1,7 @@
 import { auth, db } from "../firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { normalizeCategory } from "../points.js";
 
 const topbar = document.getElementById("topbar");
 const menuBtn = document.getElementById("menuBtn");
@@ -106,14 +107,16 @@ function addToCart(card) {
   const name = card.dataset.name;
   const price = parseFloat(card.dataset.price);
   const image = card.dataset.image;
+  const category = card.dataset.category;
 
   let cart = readCart();
   const existing = cart.find(item => item.name === name);
 
   if (existing) {
     existing.qty += 1;
+    if (!existing.category) existing.category = category;
   } else {
-    cart.push({ name, price, image, qty: 1 });
+    cart.push({ name, price, image, qty: 1, category });
   }
 
   localStorage.setItem("tisayCart", JSON.stringify(cart));
@@ -157,6 +160,7 @@ function renderGrid(gridEl, items, emptyMessage) {
     card.dataset.name = dish.name;
     card.dataset.price = dish.price;
     card.dataset.image = dish.image || 'logo.jpg';
+    card.dataset.category = normalizeCategory(dish.category);
 
     card.innerHTML = `
       <div class="dish-photo">

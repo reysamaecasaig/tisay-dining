@@ -26,6 +26,10 @@ body {
   overflow-x: hidden;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 a {
   text-decoration: none;
   color: inherit;
@@ -202,6 +206,36 @@ button {
   grid-area: items;
 }
 
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.card-head h2 {
+  margin: 0;
+}
+
+.points-balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--violet-deep);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.points-balance small {
+  font-size: 0.72rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
 .cart-items {
   display: flex;
   flex-direction: column;
@@ -246,6 +280,50 @@ button {
   font-size: 0.88rem;
   color: var(--text-muted);
   margin-bottom: 12px;
+}
+
+.item-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.points-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 33, 182, 0.28);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--violet-deep);
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.points-btn:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.points-btn.active {
+  background: linear-gradient(135deg, var(--violet), var(--violet-deep));
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.points-btn.locked {
+  color: #9a93ad;
+  border-color: rgba(107, 95, 133, 0.25);
+  background: #f6f4fa;
+}
+
+.cart-item.redeemed .item-price {
+  text-decoration: line-through;
+}
+
+.item-total.points {
+  color: var(--violet);
 }
 
 .qty {
@@ -449,6 +527,34 @@ button {
   box-shadow: 0 10px 26px var(--violet-glow);
 }
 
+.order-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  max-width: calc(100% - 32px);
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: var(--text);
+  color: #ffffff;
+  font-size: 0.88rem;
+  text-align: center;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 400;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -557,7 +663,6 @@ button {
     margin-bottom: 12px;
   }
 
-  /* Make the cart items list container scrollable on mobile */
   .cart-items {
     max-height: 340px;
     overflow-y: auto;

@@ -1,5 +1,6 @@
 import { db } from "../firebase-config.js";
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { awardOrderPoints, refundOrderPoints } from "../points.js";
 
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
@@ -15,6 +16,10 @@ const modalCustomerContact = document.getElementById("modalCustomerContact");
 const modalCustomerAddress = document.getElementById("modalCustomerAddress");
 const modalItemsList = document.getElementById("modalItemsList");
 const modalTotalAmount = document.getElementById("modalTotalAmount");
+const modalPointsInfo = document.createElement("span");
+modalPointsInfo.className = "detail-points-info";
+modalPointsInfo.hidden = true;
+if (modalTotalAmount) modalTotalAmount.insertAdjacentElement("afterend", modalPointsInfo);
 const modalAcceptBtn = document.getElementById("modalAcceptBtn");
 const modalDeclineBtn = document.getElementById("modalDeclineBtn");
 
@@ -55,12 +60,21 @@ function openOrderModal(orderId) {
   if (modalCustomerAddress) modalCustomerAddress.textContent = req.address || "N/A";
   if (modalTotalAmount) modalTotalAmount.textContent = req.total || "₱0.00";
 
+  const pointsUsed = Number(req.pointsUsed) || 0;
+  modalPointsInfo.hidden = pointsUsed === 0;
+  modalPointsInfo.textContent = `+ ${pointsUsed.toLocaleString()} pts paid by customer`;
+
   if (modalItemsList) {
     modalItemsList.innerHTML = "";
     if (Array.isArray(req.items) && req.items.length > 0) {
       req.items.forEach(item => {
         let imgSrc = item.image && item.image.trim() !== "" ? item.image : "logo.jpg";
         
+        const paidWithPoints = item.redeemed === true;
+        const priceLabel = paidWithPoints
+          ? `<span class="detail-item-price points">${Number(item.pointsCost || 0).toLocaleString()} pts</span>`
+          : `<span class="detail-item-price">₱${((item.price || 0) * (item.qty || 1)).toFixed(2)}</span>`;
+
         const row = document.createElement("div");
         row.className = "detail-item-row";
         row.innerHTML = `
@@ -68,8 +82,9 @@ function openOrderModal(orderId) {
           <div class="detail-item-meta">
             <h4 class="detail-item-name">${item.name || 'Item'}</h4>
             <span class="detail-item-qty">Qty: ${item.qty || 1} &bull; ₱${Number(item.price || 0).toFixed(2)} each</span>
+            ${paidWithPoints ? '<span class="points-tag">Paid with points</span>' : ""}
           </div>
-          <span class="detail-item-price">₱${((item.price || 0) * (item.qty || 1)).toFixed(2)}</span>
+          ${priceLabel}
         `;
         modalItemsList.appendChild(row);
       });
@@ -98,11 +113,27 @@ async function updateOrderStatus(orderId, status) {
   try {
     const orderRef = doc(db, "orders", orderId);
     await updateDoc(orderRef, { status: status });
-    showToast(`Order ${status.toLowerCase()} and moved to history.`);
-    closeOrderModal();
   } catch (err) {
     console.error("Error updating order status:", err);
+    showToast("Could not update the order. Please try again.");
+    return;
   }
+
+  let pointsMessage = "";
+  try {
+    if (status === "Accepted") {
+      const earned = await awardOrderPoints(db, orderId);
+      if (earned) pointsMessage = ` ${earned} ${earned === 1 ? "point" : "points"} credited.`;
+    } else {
+      const refunded = await refundOrderPoints(db, orderId);
+      if (refunded) pointsMessage = ` ${refunded} points refunded.`;
+    }
+  } catch (err) {
+    console.error("Error updating customer points:", err);
+  }
+
+  showToast(`Order ${status.toLowerCase()} and moved to history.${pointsMessage}`);
+  closeOrderModal();
 }
 
 if (modalAcceptBtn) {
