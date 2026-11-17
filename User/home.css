@@ -87,10 +87,10 @@ button {
 }
 
 .logo-text {
-  font-family: "Playfair Display", serif;
-  font-size: 1.3rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.02em;
 }
 
 .nav {
@@ -384,7 +384,6 @@ button {
   background: linear-gradient(90deg, var(--violet), var(--violet-bright));
 }
 
-/* Default Computer Layout: 5 Columns */
 .dish-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
