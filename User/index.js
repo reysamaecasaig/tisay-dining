@@ -132,7 +132,7 @@ function registerFailure() {
     startCountdown();
     showAlert(
       "Too many failed attempts",
-      "For your security, login is locked for a short while. You can try again when the timer ends.",
+      "For your security, your account is temporarily locked. You can try again when the timer ends.",
       true
     );
     return;

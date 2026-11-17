@@ -10,11 +10,139 @@ const eyeOffSVG = `
     <line x1="1" y1="1" x2="23" y2="23"></line>
   </svg>`;
 
+const MAX_ATTEMPTS = 3;
+const BASE_LOCK_SECONDS = 5 * 60;
+const MAX_LOCK_SECONDS = 15 * 60;
+const STORAGE_KEY = "tisayAdminGuard";
+
+const loginForm = document.getElementById("adminLoginForm");
+const usernameField = document.getElementById("adminUsername");
+const passwordField = document.getElementById("adminPassword");
+const submitBtn = loginForm.querySelector(".primary-btn");
+const submitLabel = submitBtn.textContent;
+
+const alertModal = document.getElementById("alertModal");
+const alertCard = document.getElementById("alertCard");
+const alertTitle = document.getElementById("alertTitle");
+const alertMessage = document.getElementById("alertMessage");
+const alertTimer = document.getElementById("alertTimer");
+const alertClose = document.getElementById("alertClose");
+
+let countdownTimer = null;
+
+function readGuard() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return {
+      failures: Number(stored && stored.failures) || 0,
+      lockouts: Number(stored && stored.lockouts) || 0,
+      lockedUntil: Number(stored && stored.lockedUntil) || 0
+    };
+  } catch (e) {
+    return { failures: 0, lockouts: 0, lockedUntil: 0 };
+  }
+}
+
+function writeGuard(guard) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(guard));
+  } catch (e) {}
+}
+
+function clearGuard() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {}
+}
+
+function formatWait(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return minutes > 0 ? minutes + ":" + String(rest).padStart(2, "0") : rest + "s";
+}
+
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.textContent = msg;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2600);
+}
+
+function showAlert(title, message, locked) {
+  alertTitle.textContent = title;
+  alertMessage.textContent = message;
+  alertCard.classList.toggle("locked", Boolean(locked));
+  alertTimer.hidden = !locked;
+  alertModal.classList.add("show");
+  alertClose.focus();
+}
+
+function closeAlert() {
+  alertModal.classList.remove("show");
+}
+
+alertClose.addEventListener("click", closeAlert);
+alertModal.addEventListener("click", (e) => {
+  if (e.target === alertModal) closeAlert();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeAlert();
+});
+
+function setLocked(locked) {
+  submitBtn.disabled = locked;
+  usernameField.disabled = locked;
+  passwordField.disabled = locked;
+  if (!locked) submitBtn.textContent = submitLabel;
+}
+
+function startCountdown() {
+  clearInterval(countdownTimer);
+
+  const tick = () => {
+    const remaining = Math.ceil((readGuard().lockedUntil - Date.now()) / 1000);
+    if (remaining <= 0) {
+      clearInterval(countdownTimer);
+      const guard = readGuard();
+      writeGuard({ failures: 0, lockouts: guard.lockouts, lockedUntil: 0 });
+      setLocked(false);
+      closeAlert();
+      return;
+    }
+    setLocked(true);
+    submitBtn.textContent = "Try again in " + formatWait(remaining);
+    alertTimer.textContent = "Try again in " + formatWait(remaining);
+  };
+
+  tick();
+  countdownTimer = setInterval(tick, 500);
+}
+
+function registerFailure() {
+  const guard = readGuard();
+  guard.failures += 1;
+
+  if (guard.failures >= MAX_ATTEMPTS) {
+    guard.lockouts += 1;
+    const seconds = Math.min(BASE_LOCK_SECONDS * Math.pow(2, guard.lockouts - 1), MAX_LOCK_SECONDS);
+    guard.lockedUntil = Date.now() + seconds * 1000;
+    writeGuard(guard);
+    startCountdown();
+    showAlert(
+      "Too many failed attempts",
+      "For your security, admin login is locked for a short while. You can try again when the timer ends.",
+      true
+    );
+    return;
+  }
+
+  writeGuard(guard);
+  const left = MAX_ATTEMPTS - guard.failures;
+  showAlert(
+    "Incorrect username or password",
+    "You have " + left + (left === 1 ? " attempt" : " attempts") + " left before login is temporarily locked.",
+    false
+  );
 }
 
 document.querySelectorAll(".eye-btn").forEach(btn => {
@@ -27,15 +155,24 @@ document.querySelectorAll(".eye-btn").forEach(btn => {
   });
 });
 
-document.getElementById("adminLoginForm").addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const username = document.getElementById("adminUsername").value.trim();
-  const password = document.getElementById("adminPassword").value;
 
-  if (username !== "admin" || password !== "admin123") {
-    showToast("Invalid username or password.");
+  if (readGuard().lockedUntil > Date.now()) {
+    startCountdown();
     return;
   }
 
+  const username = usernameField.value.trim();
+  const password = passwordField.value;
+
+  if (username !== "admin" || password !== "admin123") {
+    registerFailure();
+    return;
+  }
+
+  clearGuard();
   window.location.href = "admin.html";
 });
+
+if (readGuard().lockedUntil > Date.now()) startCountdown();
