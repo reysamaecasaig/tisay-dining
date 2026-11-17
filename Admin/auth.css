@@ -81,11 +81,12 @@ button, input {
 }
 
 .auth-title {
-  font-family: "Playfair Display", serif;
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.65rem;
+  font-weight: 600;
   color: var(--text);
   margin-bottom: 4px;
+  letter-spacing: -0.02em;
 }
 
 .auth-subtitle {
@@ -177,7 +178,6 @@ button, input {
   transform: scale(0.98);
 }
 
-/* Modal & Alert Dialog Styles */
 .modal {
   position: fixed;
   inset: 0;
@@ -231,9 +231,9 @@ button, input {
 }
 
 .alert-card h2 {
-  font-family: "Playfair Display", serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
 }
