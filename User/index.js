@@ -142,7 +142,7 @@ function registerFailure() {
   const left = MAX_ATTEMPTS - guard.failures;
   showAlert(
     "Incorrect email or password",
-    "You have " + left + (left === 1 ? " attempt" : " attempts") + " left before login is temporarily locked.",
+    "You have " + left + (left === 1 ? " attempt(s)" : " attempts") + " left.",
     false
   );
 }
