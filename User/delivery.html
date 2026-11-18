@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tisay Dining | Delivery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="delivery.css">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+</head>
+<body>
+
+  <header class="topbar" id="topbar">
+    <a href="home.html" class="logo" aria-label="Tisay Dining home">
+      <span class="logo-circle">
+        <img src="logo.jpg" alt="Tisay Dining logo">
+      </span>
+      <span class="logo-text">Tisay Dining</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link">About Us</a>
+      <a href="profile.html" class="profile-link" aria-label="Go to profile">
+        <img class="profile-img" id="navProfileImg" src="logo.jpg" alt="Profile picture">
+      </a>
+    </nav>
+  </header>
+
+  <main class="delivery-page">
+    <h1 class="section-title">Delivery</h1>
+    <p class="page-sub">Track your orders and see where each one stands.</p>
+    <section class="order-list" id="orderList">
+      <div class="order-empty"><p>Loading your orders...</p></div>
+    </section>
+  </main>
+
+  <script type="module" src="delivery.js"></script>
+</body>
+</html>

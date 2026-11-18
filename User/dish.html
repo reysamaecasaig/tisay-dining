@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Manage Dishes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="dish.css">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+</head>
+<body>
+
+  <header class="topbar" id="topbar">
+    <a href="admin.html" class="logo" aria-label="Admin Dashboard">
+      <span class="logo-circle">
+        <img src="logo.jpg" alt="Logo">
+      </span>
+      <span class="logo-text">Admin</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+
+    </nav>
+  </header>
+
+  <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h10"></path>
+    </svg>
+    <span>Menu</span>
+  </button>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar" aria-label="Navigation">
+    <div class="sidebar-head">
+      <h2>Navigation</h2>
+    </div>
+
+    <ul class="category-list">
+      <li><a href="admin.html" class="category">Dashboard</a></li>
+      <li><a href="dish.html" class="category active">Dishes</a></li>
+      <li><a href="request.html" class="category">Pending Request</a></li>
+      <li><a href="history.html" class="category">History</a></li>
+    </ul>
+
+    <div class="sidebar-user">
+      <img class="user-img" src="logo.jpg" alt="Admin">
+      <span class="user-name">Admin</span>
+      <button class="logout-btn" id="logoutBtn" type="button" aria-label="Log out" title="Log out">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <path d="M16 17l5-5-5-5"></path>
+          <path d="M21 12H9"></path>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="dishes-header-actions">
+      <div>
+        <h1 class="section-title">Manage Dishes</h1>
+      </div>
+      <button type="button" class="add-dish-btn" id="openAddModalBtn">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 5v14M5 12h14"></path>
+        </svg>
+        <span>Add New Dish</span>
+      </button>
+    </div>
+
+    <section class="category-section" aria-labelledby="foodsTitle">
+      <h2 class="category-section-title" id="foodsTitle">Foods</h2>
+      <div class="dishes-grid" id="grid-Foods">
+        <p class="grid-message">Loading foods...</p>
+      </div>
+    </section>
+
+    <hr class="category-divider">
+
+    <section class="category-section" aria-labelledby="dessertsTitle">
+      <h2 class="category-section-title" id="dessertsTitle">Desserts</h2>
+      <div class="dishes-grid" id="grid-Desserts">
+        <p class="grid-message">Loading desserts...</p>
+      </div>
+    </section>
+
+    <hr class="category-divider">
+
+    <section class="category-section" aria-labelledby="drinksTitle">
+      <h2 class="category-section-title" id="drinksTitle">Drinks</h2>
+      <div class="dishes-grid" id="grid-Drinks">
+        <p class="grid-message">Loading drinks...</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="dish-modal" id="dishModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="dish-modal-content">
+      <h2 class="dish-modal-title" id="modalTitle">Add New Dish</h2>
+      <form class="dish-form" id="dishForm">
+        <input type="hidden" id="dishId">
+
+        <div class="dish-form-group">
+          <label for="dishName">Dish Name</label>
+          <input type="text" id="dishName" required placeholder="e.g. Chicken Adobo" autocomplete="off">
+        </div>
+
+        <div class="dish-form-group">
+          <label for="dishPrice">Price (₱)</label>
+          <input type="number" id="dishPrice" step="0.01" min="0" required placeholder="150.00" inputmode="decimal">
+        </div>
+
+        <div class="dish-form-group">
+          <label for="dishCategory">Category</label>
+          <select id="dishCategory" required>
+            <option value="" disabled selected>Select category</option>
+            <option value="Foods">Foods</option>
+            <option value="Desserts">Desserts</option>
+            <option value="Drinks">Drinks</option>
+          </select>
+        </div>
+
+        <div class="dish-form-group">
+          <label for="dishFile">Picture</label>
+          <label class="image-picker" for="dishFile">
+            <span class="image-preview" id="imagePreview">
+              <img id="imagePreviewImg" alt="Dish preview" hidden>
+              <svg id="imagePlaceholder" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                <circle cx="8.5" cy="9" r="1.6"></circle>
+                <path d="M21 16l-5-5-8 8"></path>
+              </svg>
+            </span>
+            <span class="image-picker-text">
+              <strong id="imagePickerTitle">Choose a picture</strong>
+              <small id="imagePickerName">From your device</small>
+            </span>
+          </label>
+          <input type="file" id="dishFile" accept="image/*" hidden>
+          <input type="hidden" id="dishImage">
+        </div>
+
+        <div class="dish-form-group" id="soldOutGroup" hidden>
+          <label class="soldout-toggle" for="dishSoldOut">
+            <span class="soldout-text">
+              <strong>Sold Out</strong>
+              <small>Customers will see this dish as sold out</small>
+            </span>
+            <span class="switch">
+              <input type="checkbox" id="dishSoldOut">
+              <span class="switch-track"></span>
+            </span>
+          </label>
+        </div>
+
+        <div class="dish-modal-footer">
+          <button type="button" class="btn-secondary" id="closeModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="saveDishBtn">Save Dish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="dish.js"></script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 import { auth, db } from "../firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, doc, getDoc, setDoc, onSnapshot, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { normalizeCategory } from "../points.js";
+import { createPromoCenter } from "./promos.js";
 
 const topbar = document.getElementById("topbar");
 const menuBtn = document.getElementById("menuBtn");
@@ -16,6 +17,32 @@ const toast = document.getElementById("toast");
 const userNameEl = document.getElementById("userName");
 const navProfileImg = document.getElementById("navProfileImg");
 const sidebarProfileImg = document.getElementById("sidebarProfileImg");
+
+const promoElements = {
+  button: document.getElementById("promoBtn"),
+  dot: document.getElementById("promoDot"),
+  modal: document.getElementById("promoModal"),
+  close: document.getElementById("promoClose"),
+  list: document.getElementById("weekList"),
+  range: document.getElementById("promoRange"),
+  limited: document.getElementById("limitedPromo")
+};
+
+const STAR_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+
+let currentUid = null;
+let watching = false;
+let favorites = new Set();
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
 
 function showToast(msg) {
   if (!toast) return;
@@ -33,8 +60,79 @@ function toggleMenu() {
 if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
 if (overlay) overlay.addEventListener("click", toggleMenu);
 
+function refreshFavorites() {
+  document.querySelectorAll(".dish-card").forEach((card) => {
+    const button = card.querySelector(".fav-btn");
+    if (!button) return;
+    const active = favorites.has(card.dataset.id);
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+    button.setAttribute("aria-label", active ? "Remove from favorites" : "Add to favorites");
+  });
+}
+
+async function toggleFavorite(card) {
+  const id = card.dataset.id;
+  if (!id || !currentUid) return;
+
+  const userRef = doc(db, "users", currentUid);
+
+  if (favorites.has(id)) {
+    favorites.delete(id);
+    refreshFavorites();
+    try {
+      await setDoc(userRef, { favorites: arrayRemove(id) }, { merge: true });
+      showToast(`${card.dataset.name} removed from favorites`);
+    } catch (err) {
+      favorites.add(id);
+      refreshFavorites();
+      showToast("Could not update favorites.");
+    }
+    return;
+  }
+
+  favorites.add(id);
+  refreshFavorites();
+
+  try {
+    await Promise.race([
+      setDoc(userRef, { favorites: arrayUnion(id) }, { merge: true }),
+      new Promise((resolve) => setTimeout(resolve, 1500))
+    ]);
+  } catch (err) {
+    favorites.delete(id);
+    refreshFavorites();
+    showToast("Could not save to favorites.");
+    return;
+  }
+
+  setTimeout(() => {
+    window.location.href = "favorite.html";
+  }, 350);
+}
+
+function watchUser(uid) {
+  if (watching) return;
+  watching = true;
+
+  const promos = createPromoCenter(db, uid, promoElements, showToast);
+
+  onSnapshot(
+    doc(db, "users", uid),
+    (snap) => {
+      const data = snap.exists() ? snap.data() : {};
+      favorites = new Set(Array.isArray(data.favorites) ? data.favorites : []);
+      refreshFavorites();
+      promos.update(data);
+    },
+    (error) => console.error("Could not load user data", error)
+  );
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+    currentUid = user.uid;
+    watchUser(user.uid);
     try {
       const userDoc = await getDoc(doc(db, "users", user.uid));
       if (userDoc.exists()) {
@@ -104,6 +202,7 @@ function updateCartCount() {
 }
 
 function addToCart(card) {
+  if (card.classList.contains("sold-out")) return;
   const name = card.dataset.name;
   const price = parseFloat(card.dataset.price);
   const image = card.dataset.image;
@@ -157,19 +256,28 @@ function renderGrid(gridEl, items, emptyMessage) {
   items.forEach(dish => {
     const card = document.createElement("article");
     card.className = "dish-card";
+    card.dataset.id = dish.id || "";
     card.dataset.name = dish.name;
     card.dataset.price = dish.price;
     card.dataset.image = dish.image || 'logo.jpg';
     card.dataset.category = normalizeCategory(dish.category);
+    card.classList.toggle("sold-out", dish.soldOut === true);
+
+    const photo = dish.image || "logo.jpg";
+    const soldOut = dish.soldOut === true;
 
     card.innerHTML = `
       <div class="dish-photo">
-        <img src="${dish.image || 'logo.jpg'}" alt="${dish.name}" loading="lazy" onerror="this.src='logo.jpg'">
+        <img src="${escapeHtml(photo)}" alt="${escapeHtml(dish.name)}" loading="lazy" onerror="this.onerror=null;this.src='logo.jpg'">
+        ${soldOut ? '<span class="soldout-tag">Sold Out</span>' : ""}
       </div>
       <div class="dish-info">
-        <h3 class="dish-name">${dish.name}</h3>
+        <h3 class="dish-name">${escapeHtml(dish.name)}</h3>
         <p class="dish-price">₱${Number(dish.price || 0).toFixed(2)}</p>
-        <button type="button" class="add-btn">Add to Cart</button>
+        <div class="fav-row">
+          <button type="button" class="fav-btn" aria-pressed="false" aria-label="Add to favorites">${STAR_ICON}</button>
+        </div>
+        <button type="button" class="add-btn"${soldOut ? " disabled" : ""}>${soldOut ? "Sold Out" : "Add to Cart"}</button>
       </div>
     `;
 
@@ -177,11 +285,17 @@ function renderGrid(gridEl, items, emptyMessage) {
       addToCart(card);
     });
 
+    card.querySelector(".fav-btn").addEventListener("click", () => {
+      toggleFavorite(card);
+    });
+
     gridEl.appendChild(card);
   });
+
+  refreshFavorites();
 }
 
-async function fetchAndRenderHomeDishes() {
+function fetchAndRenderHomeDishes() {
   try {
     const cachedDishes = localStorage.getItem("tisayCachedDishes");
     if (cachedDishes) {
@@ -192,21 +306,26 @@ async function fetchAndRenderHomeDishes() {
     }
   } catch (err) {}
 
-  try {
-    const querySnapshot = await getDocs(collection(db, "dishes"));
-    const dishes = [];
-    querySnapshot.forEach((docSnap) => {
-      dishes.push({ id: docSnap.id, ...docSnap.data() });
-    });
+  onSnapshot(
+    collection(db, "dishes"),
+    (querySnapshot) => {
+      const dishes = [];
+      querySnapshot.forEach((docSnap) => {
+        dishes.push({ id: docSnap.id, ...docSnap.data() });
+      });
 
-    localStorage.setItem("tisayCachedDishes", JSON.stringify(dishes));
-    renderDishesData(dishes);
-  } catch (error) {
-    const gridFoods = document.getElementById("grid-Foods");
-    if (gridFoods && !localStorage.getItem("tisayCachedDishes")) {
-      gridFoods.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #dc2626; padding: 40px;">Failed to load dishes from Firebase.</div>`;
+      try {
+        localStorage.setItem("tisayCachedDishes", JSON.stringify(dishes));
+      } catch (err) {}
+      renderDishesData(dishes);
+    },
+    () => {
+      const gridFoods = document.getElementById("grid-Foods");
+      if (gridFoods && !localStorage.getItem("tisayCachedDishes")) {
+        gridFoods.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #dc2626; padding: 40px;">Failed to load dishes from Firebase.</div>`;
+      }
     }
-  }
+  );
 }
 
 window.addEventListener("storage", (e) => {

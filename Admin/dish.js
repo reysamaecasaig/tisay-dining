@@ -29,6 +29,8 @@ const dishPriceInput = document.getElementById("dishPrice");
 const dishCategoryInput = document.getElementById("dishCategory");
 const dishImageInput = document.getElementById("dishImage");
 const dishFileInput = document.getElementById("dishFile");
+const soldOutGroup = document.getElementById("soldOutGroup");
+const dishSoldOutInput = document.getElementById("dishSoldOut");
 const imagePreviewImg = document.getElementById("imagePreviewImg");
 const imagePlaceholder = document.getElementById("imagePlaceholder");
 const imagePickerTitle = document.getElementById("imagePickerTitle");
@@ -135,12 +137,16 @@ function openModal(isEdit = false, dish = null) {
     dishCategoryInput.value = dish.category;
     dishImageInput.value = dish.image || "";
     showPreview(dish.image, dish.image && dish.image.startsWith("data:") ? "Current picture" : "Current picture link");
+    soldOutGroup.hidden = false;
+    dishSoldOutInput.checked = dish.soldOut === true;
   } else {
     modalTitle.textContent = "Add New Dish";
     dishForm.reset();
     dishIdInput.value = "";
     dishImageInput.value = "";
     showPreview("", "From your device");
+    soldOutGroup.hidden = true;
+    dishSoldOutInput.checked = false;
   }
   dishModal.classList.add("show");
 }
@@ -203,10 +209,11 @@ function renderGrid(container, items, emptyMessage) {
 
   items.forEach(dish => {
     const card = document.createElement("div");
-    card.className = "dish-card";
+    card.className = "dish-card" + (dish.soldOut === true ? " is-sold-out" : "");
     card.innerHTML = `
       <div class="dish-img-wrap">
         <span class="dish-category-badge">${escapeHtml(dish.category || 'General')}</span>
+        ${dish.soldOut === true ? '<span class="dish-soldout-badge">Sold Out</span>' : ''}
         <img src="${escapeHtml(dish.image || 'logo.jpg')}" alt="${escapeHtml(dish.name || '')}" onerror="this.onerror=null;this.src='logo.jpg'">
       </div>
       <div class="dish-body">
@@ -261,7 +268,7 @@ if (dishForm) {
       return;
     }
 
-    const dishData = { name, price, category, image };
+    const dishData = { name, price, category, image, soldOut: dishSoldOutInput.checked };
 
     try {
       if (id) {
