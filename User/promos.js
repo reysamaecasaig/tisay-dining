@@ -80,7 +80,7 @@ export function createPromoCenter(db, uid, ui, notify) {
 
     if (state.promo === "hidden") {
       ui.limited.innerHTML = '<div class="promo-empty"><strong>Limited Time Promo</strong>' +
-        '<p>No promo right now. It comes back on a random week, so check again soon.</p></div>';
+        '<p>No promo right now available, check again soon.</p></div>';
     } else {
       const claimed = state.promo === "claimed";
       ui.limited.innerHTML = '<div class="promo-offer"><span class="promo-tag">Limited Time</span>' +

@@ -1,113 +1,131 @@
-import {
-  doc,
-  collection,
-  getDocs,
-  query,
-  where,
-  runTransaction,
-  serverTimestamp,
-  increment
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-export const POINT_COSTS = { Foods: 150, Desserts: 100, Drinks: 50 };
-export const REFUND_STATUSES = ["Rejected", "Declined", "Cancelled", "Canceled"];
+export const REFUND_STATUSES = ["Rejected", "Cancelled", "Canceled", "Declined"];
 
-const inFlight = new Set();
+export const REWARD_COSTS = {
+  food: 150,
+  dessert: 100,
+  drink: 50
+};
 
-export function normalizeCategory(value) {
-  const key = String(value || "").trim().toLowerCase();
-  if (key === "foods" || key === "food" || key === "main course") return "Foods";
-  if (key === "desserts" || key === "dessert") return "Desserts";
-  if (key === "drinks" || key === "drink" || key === "beverage" || key === "beverages") return "Drinks";
-  return "";
+export function normalizeCategory(category) {
+  const val = String(category || "").trim().toLowerCase();
+  if (val === "foods" || val === "food" || val === "main course") return "Foods";
+  if (val === "desserts" || val === "dessert") return "Desserts";
+  if (val === "drinks" || val === "drink") return "Drinks";
+  return category || "Foods";
 }
 
 export function countDishes(items) {
-  return (Array.isArray(items) ? items : []).reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
-}
-
-export async function placeOrder(db, uid, order) {
-  const userRef = doc(db, "users", uid);
-  const orderRef = doc(collection(db, "orders"));
-
-  await runTransaction(db, async (tx) => {
-    if (order.pointsUsed > 0) {
-      const snap = await tx.get(userRef);
-      const balance = snap.exists() ? Number(snap.data().points) || 0 : 0;
-      if (balance < order.pointsUsed) throw new Error("INSUFFICIENT_POINTS");
-      tx.set(userRef, { points: balance - order.pointsUsed }, { merge: true });
-    }
-
-    tx.set(orderRef, {
-      ...order,
-      uid: uid,
-      status: "Pending",
-      pointsAwarded: false,
-      createdAt: serverTimestamp()
-    });
-  });
-
-  return orderRef.id;
-}
-
-export async function awardOrderPoints(db, orderId) {
-  const orderRef = doc(db, "orders", orderId);
-
-  return runTransaction(db, async (tx) => {
-    const snap = await tx.get(orderRef);
-    if (!snap.exists()) return 0;
-
-    const order = snap.data();
-    if (order.status !== "Accepted" || order.pointsAwarded || !order.uid) return 0;
-
-    const earned = countDishes(order.items);
-    tx.set(doc(db, "users", order.uid), { points: increment(earned) }, { merge: true });
-    tx.update(orderRef, { pointsAwarded: true, pointsEarned: earned });
-    return earned;
-  });
-}
-
-export async function refundOrderPoints(db, orderId) {
-  const orderRef = doc(db, "orders", orderId);
-
-  return runTransaction(db, async (tx) => {
-    const snap = await tx.get(orderRef);
-    if (!snap.exists()) return 0;
-
-    const order = snap.data();
-    const used = Number(order.pointsUsed) || 0;
-    if (!REFUND_STATUSES.includes(order.status) || !used || order.pointsRefunded || !order.uid) return 0;
-
-    tx.set(doc(db, "users", order.uid), { points: increment(used) }, { merge: true });
-    tx.update(orderRef, { pointsRefunded: true });
-    return used;
-  });
+  if (!Array.isArray(items)) return 0;
+  return items.reduce((total, item) => {
+    const qty = Number(item && item.qty ? item.qty : 1);
+    return total + (Number.isFinite(qty) && qty > 0 ? qty : 1);
+  }, 0);
 }
 
 export async function syncOrderDoc(db, orderId, order) {
-  const needsAward = order.status === "Accepted" && !order.pointsAwarded;
-  const needsRefund =
-    REFUND_STATUSES.includes(order.status) && Number(order.pointsUsed) > 0 && !order.pointsRefunded;
+  if (!db || !orderId || !order || !order.uid) return;
 
-  if (!needsAward && !needsRefund) return;
-  if (inFlight.has(orderId)) return;
+  const status = String(order.status || "Pending");
+  const dishes = countDishes(order.items);
+  const pointsToAward = Number(order.pointsEarned) > 0 ? Number(order.pointsEarned) : dishes;
+  const pointsUsed = Math.max(0, Number(order.pointsUsed) || 0);
+  const isRefundedStatus = REFUND_STATUSES.includes(status);
 
-  inFlight.add(orderId);
+  const alreadyAwarded = order.pointsAwarded === true;
+  const alreadyRefunded = order.pointsRefunded === true;
+
+  if (status === "Accepted" && alreadyAwarded) return;
+  if (isRefundedStatus && (!pointsUsed || alreadyRefunded)) return;
+  if (status !== "Accepted" && !isRefundedStatus) return;
+
+  const orderRef = doc(db, "orders", orderId);
+  const userRef = doc(db, "users", order.uid);
+
   try {
-    if (needsAward) await awardOrderPoints(db, orderId);
-    if (needsRefund) await refundOrderPoints(db, orderId);
-  } catch (error) {
-    console.error("Points sync failed for order " + orderId, error);
-  } finally {
-    inFlight.delete(orderId);
+    await runTransaction(db, async (transaction) => {
+      const orderSnap = await transaction.get(orderRef);
+      if (!orderSnap.exists()) return;
+
+      const latestOrder = orderSnap.data();
+      const latestStatus = String(latestOrder.status || "Pending");
+      const latestDishes = countDishes(latestOrder.items);
+      const latestEarned = Number(latestOrder.pointsEarned) > 0 ? Number(latestOrder.pointsEarned) : latestDishes;
+      const latestUsed = Math.max(0, Number(latestOrder.pointsUsed) || 0);
+      const latestRefundedStatus = REFUND_STATUSES.includes(latestStatus);
+
+      const userSnap = await transaction.get(userRef);
+      const currentPoints = userSnap.exists() ? Math.max(0, Number(userSnap.data().points) || 0) : 0;
+
+      if (latestStatus === "Accepted" && latestOrder.pointsAwarded !== true) {
+        transaction.set(
+          userRef,
+          {
+            points: currentPoints + latestEarned,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+        transaction.update(orderRef, {
+          pointsEarned: latestEarned,
+          pointsAwarded: true,
+          pointsAwardedAt: serverTimestamp()
+        });
+      } else if (latestRefundedStatus && latestUsed > 0 && latestOrder.pointsRefunded !== true) {
+        transaction.set(
+          userRef,
+          {
+            points: currentPoints + latestUsed,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+        transaction.update(orderRef, {
+          pointsRefunded: true,
+          pointsRefundedAt: serverTimestamp()
+        });
+      }
+    });
+  } catch (err) {
+    console.error("Points sync error:", err);
   }
 }
 
-export async function syncUserOrders(db, uid) {
+export async function redeemRewardPoints(db, uid, pointsCost, rewardLabel = "Reward") {
+  const cost = Math.max(0, Number(pointsCost) || 0);
+  if (!db || !uid || cost <= 0) {
+    return { ok: false, message: "Invalid reward points cost." };
+  }
+
+  const userRef = doc(db, "users", uid);
+
   try {
-    const snapshot = await getDocs(query(collection(db, "orders"), where("uid", "==", uid)));
-    await Promise.all(snapshot.docs.map((docSnap) => syncOrderDoc(db, docSnap.id, docSnap.data())));
-  } catch (error) {
-    console.error("Could not sync order points", error);
+    const result = await runTransaction(db, async (transaction) => {
+      const userSnap = await transaction.get(userRef);
+      const currentPoints = userSnap.exists() ? Math.max(0, Number(userSnap.data().points) || 0) : 0;
+
+      if (currentPoints < cost) {
+        return { ok: false, points: currentPoints, message: "Not enough points." };
+      }
+
+      const nextPoints = currentPoints - cost;
+      transaction.set(
+        userRef,
+        {
+          points: nextPoints,
+          lastRedeemedReward: rewardLabel,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      return { ok: true, points: nextPoints, message: `Redeemed ${rewardLabel} for ${cost} pts!` };
+    });
+
+    return result;
+  } catch (err) {
+    console.error("Redeem reward error:", err);
+    return { ok: false, message: "Could not redeem points." };
   }
 }

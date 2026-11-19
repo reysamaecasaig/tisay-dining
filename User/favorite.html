@@ -3,39 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Favorites - Tisay Dining</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="home.css">
+  <title>Tisay Dining | Favorites</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="favorite.css">
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
 </head>
 <body>
 
-  <header class="topbar">
-    <div class="logo">
-      <a href="home.html" class="back-link">← Back to Menu</a>
-      <span class="logo-text">My Favorite Dishes</span>
-    </div>
+  <header class="topbar" id="topbar">
+    <a href="home.html" class="logo" aria-label="Tisay Dining home">
+      <span class="logo-circle">
+        <img src="logo.jpg" alt="Tisay Dining logo">
+      </span>
+      <span class="logo-text">Tisay Dining</span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link">About Us</a>
+      <a href="profile.html" class="profile-link" aria-label="Go to profile">
+        <img class="profile-img" id="navProfileImg" src="logo.jpg" alt="Profile picture">
+      </a>
+    </nav>
   </header>
 
+  <a href="cart.html" class="cart-btn" aria-label="Go to cart">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="9" cy="20" r="1.4"></circle>
+      <circle cx="18" cy="20" r="1.4"></circle>
+      <path d="M2.5 3.5h2.8l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.2l1.6-7.3H6.3"></path>
+    </svg>
+    <span class="cart-count" id="cartCount">0</span>
+  </a>
+
   <main class="content">
-    <h1 class="section-title">Saved Favorites</h1>
-    <div class="dish-grid" id="favoritesContainer">
-      <div class="dish-card">
-        <div class="dish-img-wrap">
-          <img src="dish1.jpg" alt="Special Pork Adobo">
-        </div>
-        <div class="dish-info">
-          <h3>Special Pork Adobo</h3>
-          <p class="dish-desc">Tender pork simmered in rich soy sauce, vinegar, and garlic.</p>
-          <div class="dish-footer">
-            <span class="dish-price">₱180.00</span>
-            <button class="fav-icon-btn clicked" aria-label="Favorite">
-              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <h1 class="section-title">Favorites</h1>
+    <section class="dish-grid" id="favoriteGrid">
+      <div class="fav-empty"><p>Loading your favorites...</p></div>
+    </section>
   </main>
 
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="favorite.js"></script>
 </body>
 </html>
